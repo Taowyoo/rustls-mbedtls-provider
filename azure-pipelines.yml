@@ -1,0 +1,29 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-20.04
+
+steps:
+- script: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  displayName: 'Install rustup'
+
+- script: |
+    # rustup target add x86_64-fortanix-unknown-sgx x86_64-unknown-linux-musl
+    rustup toolchain add nightly
+    # rustup target add x86_64-fortanix-unknown-sgx --toolchain nightly
+    rustup update
+  displayName: 'Setup Rust toolchain'
+
+- script: |
+    git clone $(Build.Repository.Uri) $(Build.SourcesDirectory)
+  displayName: 'Clone Repository'
+
+- script: cargo test
+  displayName: 'Cargo test'
+  workingDirectory: $(Build.SourcesDirectory)
